@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0e4d40"/>
+      <stop offset="100%" style="stop-color:#166a58"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9a7820"/>
+      <stop offset="50%" style="stop-color:#e0b84a"/>
+      <stop offset="100%" style="stop-color:#9a7820"/>
+    </linearGradient>
+    <linearGradient id="holo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   style="stop-color:#c8a13a;stop-opacity:0.4"/>
+      <stop offset="50%"  style="stop-color:#81c784;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#c8a13a;stop-opacity:0.4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Card body -->
+  <rect x="4" y="16" width="120" height="96" rx="8" ry="8" fill="url(#bg)"/>
+
+  <!-- Gold stripe top -->
+  <rect x="4" y="16" width="120" height="6" rx="4" ry="4" fill="url(#gold)" opacity="0.9"/>
+
+  <!-- Gold stripe bottom -->
+  <rect x="4" y="106" width="120" height="6" rx="4" ry="4" fill="url(#gold)" opacity="0.9"/>
+
+  <!-- Hologram corner -->
+  <rect x="88" y="22" width="32" height="32" rx="3" fill="url(#holo)"/>
+
+  <!-- Steering wheel icon in holo -->
+  <circle cx="104" cy="38" r="11" fill="none" stroke="#c8a13a" stroke-width="1.5" opacity="0.8"/>
+  <circle cx="104" cy="38" r="4" fill="none" stroke="#c8a13a" stroke-width="1.5" opacity="0.8"/>
+  <line x1="104" y1="27" x2="104" y2="34" stroke="#c8a13a" stroke-width="1.5" opacity="0.8"/>
+  <line x1="93" y1="38" x2="100" y2="38" stroke="#c8a13a" stroke-width="1.5" opacity="0.8"/>
+  <line x1="108" y1="38" x2="115" y2="38" stroke="#c8a13a" stroke-width="1.5" opacity="0.8"/>
+
+  <!-- Photo frame -->
+  <rect x="12" y="28" width="28" height="36" rx="2" fill="#062d24" stroke="#c8a13a" stroke-width="1"/>
+  <ellipse cx="26" cy="36" rx="6" ry="6" fill="#1a5a48" opacity="0.7"/>
+  <path d="M14 64 Q26 52 38 64" fill="#1a5a48" opacity="0.7"/>
+
+  <!-- Label -->
+  <text x="64" y="36" text-anchor="middle" font-size="5.5" fill="url(#gold)" font-family="'Arial Narrow',sans-serif" letter-spacing="2" font-weight="bold">DRIVER LICENSE</text>
+
+  <!-- State -->
+  <text x="64" y="44" text-anchor="middle" font-size="4.5" fill="#7acbb8" font-family="sans-serif" letter-spacing="1.5">SAN ANDREAS</text>
+
+  <!-- Data lines -->
+  <rect x="46" y="50" width="70" height="1.5" rx="0.5" fill="#c8a13a" opacity="0.4"/>
+  <text x="46" y="60" font-size="4" fill="#8abcb0" font-family="sans-serif">LAST NAME / FIRST NAME</text>
+  <rect x="46" y="62" width="70" height="1.5" rx="0.5" fill="#c8a13a" opacity="0.4"/>
+
+  <text x="46" y="72" font-size="4" fill="#8abcb0" font-family="sans-serif">DATE OF BIRTH</text>
+  <rect x="46" y="74" width="34" height="1.5" rx="0.5" fill="#c8a13a" opacity="0.4"/>
+
+  <text x="84" y="72" font-size="4" fill="#8abcb0" font-family="sans-serif">SEX</text>
+  <rect x="84" y="74" width="14" height="1.5" rx="0.5" fill="#c8a13a" opacity="0.4"/>
+
+  <text x="103" y="72" font-size="4" fill="#8abcb0" font-family="sans-serif">CLASS</text>
+  <rect x="103" y="74" width="13" height="1.5" rx="0.5" fill="#c8a13a" opacity="0.4"/>
+
+  <!-- Barcode -->
+  <rect x="12" y="84" width="104" height="14" rx="2" fill="#041f19" opacity="0.6"/>
+  <g fill="#3a8a78" opacity="0.7">
+    <rect x="14" y="86" width="1" height="10"/>
+    <rect x="16.5" y="86" width="2" height="10"/>
+    <rect x="20" y="86" width="1.5" height="10"/>
+    <rect x="23" y="86" width="1" height="10"/>
+    <rect x="25.5" y="86" width="2.5" height="10"/>
+    <rect x="29.5" y="86" width="1" height="10"/>
+    <rect x="32" y="86" width="2" height="10"/>
+    <rect x="35.5" y="86" width="1" height="10"/>
+    <rect x="38" y="86" width="1.5" height="10"/>
+    <rect x="41" y="86" width="2.5" height="10"/>
+    <rect x="45" y="86" width="1" height="10"/>
+    <rect x="47.5" y="86" width="2" height="10"/>
+    <rect x="51" y="86" width="1.5" height="10"/>
+    <rect x="54" y="86" width="1" height="10"/>
+    <rect x="56.5" y="86" width="2.5" height="10"/>
+    <rect x="60.5" y="86" width="1" height="10"/>
+    <rect x="63" y="86" width="2" height="10"/>
+    <rect x="66.5" y="86" width="1.5" height="10"/>
+    <rect x="69.5" y="86" width="1" height="10"/>
+    <rect x="72" y="86" width="2" height="10"/>
+    <rect x="75.5" y="86" width="1" height="10"/>
+    <rect x="78" y="86" width="1.5" height="10"/>
+    <rect x="81" y="86" width="2.5" height="10"/>
+    <rect x="85" y="86" width="1" height="10"/>
+    <rect x="87.5" y="86" width="2" height="10"/>
+    <rect x="91" y="86" width="1.5" height="10"/>
+    <rect x="94" y="86" width="1" height="10"/>
+    <rect x="96.5" y="86" width="2.5" height="10"/>
+    <rect x="100.5" y="86" width="1" height="10"/>
+    <rect x="103" y="86" width="2" height="10"/>
+    <rect x="106.5" y="86" width="1" height="10"/>
+    <rect x="109" y="86" width="1.5" height="10"/>
+    <rect x="112" y="86" width="1" height="10"/>
+  </g>
+  <text x="64" y="103" text-anchor="middle" font-size="3.5" fill="#4a8a78" font-family="monospace">SA•DL•2024•SECURE</text>
+</svg>
