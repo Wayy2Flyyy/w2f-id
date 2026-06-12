@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" width="920" height="580">
+  <defs>
+    <linearGradient id="screenbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#060f0a"/>
+      <stop offset="100%" style="stop-color:#0c1a12"/>
+    </linearGradient>
+    <linearGradient id="cardbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0e4d40"/>
+      <stop offset="100%" style="stop-color:#166a58"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9a7820"/>
+      <stop offset="50%" style="stop-color:#e8c84a"/>
+      <stop offset="100%" style="stop-color:#9a7820"/>
+    </linearGradient>
+    <linearGradient id="holo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   style="stop-color:#c8a13a;stop-opacity:0.5"/>
+      <stop offset="40%"  style="stop-color:#81c784;stop-opacity:0.4"/>
+      <stop offset="70%"  style="stop-color:#4dd0e1;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#c8a13a;stop-opacity:0.5"/>
+    </linearGradient>
+    <filter id="cardShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="20" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+    <clipPath id="cardClip">
+      <rect x="230" y="140" width="460" height="300" rx="16" ry="16"/>
+    </clipPath>
+  </defs>
+
+  <rect width="920" height="580" fill="url(#screenbg)"/>
+  <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" style="stop-color:#000000;stop-opacity:0"/>
+    <stop offset="100%" style="stop-color:#000000;stop-opacity:0.5"/>
+  </radialGradient>
+  <rect width="920" height="580" fill="url(#vignette)"/>
+
+  <g filter="url(#cardShadow)">
+    <rect x="230" y="140" width="460" height="300" rx="16" ry="16" fill="url(#cardbg)"/>
+  </g>
+
+  <!-- Guilloche waves -->
+  <g clip-path="url(#cardClip)" stroke="#3a8a78" stroke-width="0.4" fill="none" opacity="0.12">
+    <path d="M230 180 Q350 168 460 180 Q570 192 690 180"/>
+    <path d="M230 196 Q350 184 460 196 Q570 208 690 196"/>
+    <path d="M230 212 Q350 200 460 212 Q570 224 690 212"/>
+    <path d="M230 228 Q350 216 460 228 Q570 240 690 228"/>
+    <path d="M230 244 Q350 232 460 244 Q570 256 690 244"/>
+    <path d="M230 260 Q350 248 460 260 Q570 272 690 260"/>
+    <path d="M230 276 Q350 264 460 276 Q570 288 690 276"/>
+    <path d="M230 292 Q350 280 460 292 Q570 304 690 292"/>
+    <path d="M230 308 Q350 296 460 308 Q570 320 690 308"/>
+    <path d="M230 324 Q350 312 460 324 Q570 336 690 324"/>
+    <path d="M230 340 Q350 328 460 340 Q570 352 690 340"/>
+    <path d="M230 356 Q350 344 460 356 Q570 368 690 356"/>
+    <path d="M230 372 Q350 360 460 372 Q570 384 690 372"/>
+    <path d="M230 388 Q350 376 460 388 Q570 400 690 388"/>
+    <path d="M230 404 Q350 392 460 404 Q570 416 690 404"/>
+    <path d="M230 420 Q350 408 460 420 Q570 432 690 420"/>
+  </g>
+
+  <!-- Gold stripes -->
+  <rect x="230" y="140" width="460" height="22" rx="16" ry="16" fill="url(#gold)" opacity="0.9"/>
+  <rect x="230" y="154" width="460" height="8" fill="url(#gold)" opacity="0.9"/>
+  <rect x="230" y="418" width="460" height="22" rx="16" ry="16" fill="url(#gold)" opacity="0.9"/>
+  <rect x="230" y="418" width="460" height="8" fill="url(#gold)" opacity="0.9"/>
+
+  <!-- Hologram panel -->
+  <rect x="530" y="162" width="140" height="140" rx="6" fill="url(#holo)"/>
+  <rect x="532" y="164" width="136" height="136" rx="5" fill="none" stroke="#e8c84a" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- Steering wheel in holo -->
+  <circle cx="600" cy="232" r="48" fill="none" stroke="#e8c84a" stroke-width="2" opacity="0.7"/>
+  <circle cx="600" cy="232" r="18" fill="none" stroke="#e8c84a" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="184" x2="600" y2="214" stroke="#e8c84a" stroke-width="2.5" opacity="0.7"/>
+  <line x1="552" y1="232" x2="582" y2="232" stroke="#e8c84a" stroke-width="2.5" opacity="0.7"/>
+  <line x1="618" y1="232" x2="648" y2="232" stroke="#e8c84a" stroke-width="2.5" opacity="0.7"/>
+  <line x1="600" y1="250" x2="600" y2="280" stroke="#e8c84a" stroke-width="2.5" opacity="0.7"/>
+  <text x="600" y="237" text-anchor="middle" font-size="11" fill="#e8c84a" font-family="serif" opacity="0.8">DL</text>
+  <text x="600" y="222" text-anchor="middle" font-size="8" fill="#e8c84a" font-family="sans-serif" letter-spacing="1" opacity="0.6">SAN ANDREAS</text>
+
+  <!-- Photo frame -->
+  <rect x="248" y="166" width="104" height="130" rx="6" fill="#062d24" stroke="#c8a13a" stroke-width="2"/>
+  <ellipse cx="300" cy="200" rx="26" ry="26" fill="#0e5044" opacity="0.8"/>
+  <path d="M250 296 Q300 260 350 296" fill="#0e5044" opacity="0.8"/>
+  <rect x="250" y="168" width="8" height="2" fill="#c8a13a" opacity="0.7"/>
+  <rect x="250" y="168" width="2" height="8" fill="#c8a13a" opacity="0.7"/>
+  <rect x="344" y="168" width="8" height="2" fill="#c8a13a" opacity="0.7"/>
+  <rect x="350" y="168" width="2" height="8" fill="#c8a13a" opacity="0.7"/>
+  <rect x="250" y="290" width="8" height="2" fill="#c8a13a" opacity="0.7"/>
+  <rect x="250" y="288" width="2" height="8" fill="#c8a13a" opacity="0.7"/>
+  <rect x="344" y="290" width="8" height="2" fill="#c8a13a" opacity="0.7"/>
+  <rect x="350" y="288" width="2" height="8" fill="#c8a13a" opacity="0.7"/>
+
+  <!-- Title -->
+  <text x="375" y="192" text-anchor="middle" font-size="13" fill="url(#gold)" font-family="'Arial Narrow',Arial,sans-serif" letter-spacing="4" font-weight="bold">DRIVER LICENSE</text>
+  <text x="375" y="210" text-anchor="middle" font-size="10" fill="#7acbb8" font-family="sans-serif" letter-spacing="3">SAN ANDREAS</text>
+
+  <rect x="362" y="220" width="260" height="1.5" fill="url(#gold)" opacity="0.5"/>
+
+  <!-- Data -->
+  <text x="362" y="242" font-size="8.5" fill="#3a8a78" font-family="sans-serif" font-weight="bold" letter-spacing="1.5">LAST NAME</text>
+  <text x="362" y="258" font-size="16" fill="#e8f8f4" font-family="'Arial Narrow',sans-serif" letter-spacing="1">MERCER</text>
+
+  <text x="480" y="242" font-size="8.5" fill="#3a8a78" font-family="sans-serif" font-weight="bold" letter-spacing="1.5">FIRST NAME</text>
+  <text x="480" y="258" font-size="16" fill="#e8f8f4" font-family="'Arial Narrow',sans-serif" letter-spacing="1">JORDAN</text>
+
+  <rect x="362" y="264" width="258" height="1" fill="#1a5a48" opacity="0.6"/>
+
+  <text x="362" y="282" font-size="8.5" fill="#3a8a78" font-family="sans-serif" font-weight="bold" letter-spacing="1.5">DATE OF BIRTH</text>
+  <text x="362" y="296" font-size="14" fill="#e8f8f4" font-family="'Arial Narrow',sans-serif" letter-spacing="0.5">04/15/1992</text>
+
+  <text x="460" y="282" font-size="8.5" fill="#3a8a78" font-family="sans-serif" font-weight="bold" letter-spacing="1.5">SEX</text>
+  <text x="460" y="296" font-size="14" fill="#e8f8f4" font-family="'Arial Narrow',sans-serif">M</text>
+
+  <text x="510" y="282" font-size="8.5" fill="#3a8a78" font-family="sans-serif" font-weight="bold" letter-spacing="1.5">CLASS</text>
+  <text x="510" y="296" font-size="16" fill="#e8f8f4" font-family="'Arial Narrow',sans-serif" font-weight="bold">C</text>
+
+  <rect x="362" y="302" width="258" height="1" fill="#1a5a48" opacity="0.6"/>
+
+  <text x="362" y="318" font-size="8.5" fill="#3a8a78" font-family="sans-serif" font-weight="bold" letter-spacing="1.5">ADDRESS</text>
+  <text x="362" y="332" font-size="12" fill="#a8d8cc" font-family="'Arial Narrow',sans-serif" letter-spacing="0.5">142 Vespucci Blvd, Los Santos</text>
+
+  <!-- Doc number -->
+  <rect x="248" y="306" width="104" height="28" rx="4" fill="#041f19" opacity="0.8"/>
+  <text x="300" y="322" text-anchor="middle" font-size="8" fill="#4a8a78" font-family="monospace" letter-spacing="1">DOC NO.</text>
+  <text x="300" y="330" text-anchor="middle" font-size="9" fill="#7abcaa" font-family="monospace" letter-spacing="2">D·4F2K91QX</text>
+
+  <!-- Barcode -->
+  <rect x="248" y="346" width="442" height="52" rx="6" fill="#041f19" opacity="0.7"/>
+  <g fill="#2a7a68" opacity="0.8">
+    <rect x="258" y="354" width="2" height="36"/>
+    <rect x="263" y="354" width="4" height="36"/>
+    <rect x="271" y="354" width="2" height="36"/>
+    <rect x="276" y="354" width="3" height="36"/>
+    <rect x="282" y="354" width="2" height="36"/>
+    <rect x="288" y="354" width="5" height="36"/>
+    <rect x="297" y="354" width="2" height="36"/>
+    <rect x="303" y="354" width="4" height="36"/>
+    <rect x="311" y="354" width="2" height="36"/>
+    <rect x="317" y="354" width="3" height="36"/>
+    <rect x="323" y="354" width="2" height="36"/>
+    <rect x="328" y="354" width="5" height="36"/>
+    <rect x="337" y="354" width="2" height="36"/>
+    <rect x="343" y="354" width="4" height="36"/>
+    <rect x="351" y="354" width="2" height="36"/>
+    <rect x="357" y="354" width="3" height="36"/>
+    <rect x="363" y="354" width="2" height="36"/>
+    <rect x="369" y="354" width="5" height="36"/>
+    <rect x="378" y="354" width="2" height="36"/>
+    <rect x="384" y="354" width="4" height="36"/>
+    <rect x="392" y="354" width="2" height="36"/>
+    <rect x="398" y="354" width="3" height="36"/>
+    <rect x="404" y="354" width="2" height="36"/>
+    <rect x="410" y="354" width="5" height="36"/>
+    <rect x="419" y="354" width="2" height="36"/>
+    <rect x="425" y="354" width="4" height="36"/>
+    <rect x="433" y="354" width="2" height="36"/>
+    <rect x="439" y="354" width="3" height="36"/>
+    <rect x="445" y="354" width="2" height="36"/>
+    <rect x="451" y="354" width="5" height="36"/>
+    <rect x="460" y="354" width="2" height="36"/>
+    <rect x="466" y="354" width="4" height="36"/>
+    <rect x="474" y="354" width="2" height="36"/>
+    <rect x="480" y="354" width="3" height="36"/>
+    <rect x="486" y="354" width="2" height="36"/>
+    <rect x="492" y="354" width="5" height="36"/>
+    <rect x="501" y="354" width="2" height="36"/>
+    <rect x="507" y="354" width="4" height="36"/>
+    <rect x="515" y="354" width="2" height="36"/>
+    <rect x="521" y="354" width="3" height="36"/>
+    <rect x="527" y="354" width="2" height="36"/>
+    <rect x="533" y="354" width="5" height="36"/>
+    <rect x="542" y="354" width="2" height="36"/>
+    <rect x="548" y="354" width="4" height="36"/>
+    <rect x="556" y="354" width="2" height="36"/>
+    <rect x="562" y="354" width="3" height="36"/>
+    <rect x="568" y="354" width="2" height="36"/>
+    <rect x="574" y="354" width="5" height="36"/>
+    <rect x="583" y="354" width="2" height="36"/>
+    <rect x="589" y="354" width="4" height="36"/>
+    <rect x="597" y="354" width="2" height="36"/>
+    <rect x="603" y="354" width="3" height="36"/>
+    <rect x="609" y="354" width="2" height="36"/>
+    <rect x="615" y="354" width="5" height="36"/>
+    <rect x="624" y="354" width="2" height="36"/>
+    <rect x="630" y="354" width="4" height="36"/>
+    <rect x="638" y="354" width="2" height="36"/>
+    <rect x="644" y="354" width="3" height="36"/>
+    <rect x="650" y="354" width="2" height="36"/>
+    <rect x="656" y="354" width="5" height="36"/>
+    <rect x="665" y="354" width="2" height="36"/>
+    <rect x="671" y="354" width="4" height="36"/>
+    <rect x="679" y="354" width="2" height="36"/>
+    <rect x="685" y="354" width="3" height="36"/>
+  </g>
+  <text x="460" y="408" text-anchor="middle" font-size="9" fill="#2a7a68" font-family="monospace" letter-spacing="3">4F2K91QX • SAN ANDREAS DRIVER LICENSE</text>
+
+  <text x="248" y="422" font-size="8" fill="#3a6a5a" font-family="sans-serif">ISS: 06/12/2026</text>
+  <text x="330" y="422" font-size="8" fill="#3a6a5a" font-family="sans-serif">EXP: 06/2030</text>
+
+  <text x="460" y="475" text-anchor="middle" font-size="11" fill="#3a6a5a" font-family="sans-serif" letter-spacing="2">DRIVER LICENSE</text>
+  <text x="460" y="495" text-anchor="middle" font-size="9" fill="#2a4a3a" font-family="sans-serif">Auto-dismisses after 6 seconds • Class field support</text>
+  <text x="460" y="545" text-anchor="middle" font-size="10" fill="#1a2a1a" font-family="sans-serif" letter-spacing="3">W2F-ID  •  wayy2flyyy</text>
+</svg>
