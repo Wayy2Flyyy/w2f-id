@@ -2,15 +2,32 @@ local DB = Config.Database
 local C = DB.columns
 local T = DB.table
 
-PID.Q = {
-    select = ('SELECT %s FROM %s WHERE %s = ?'):format(C.id, T, C.identifier),
-    insert = ('INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, NOW(), NOW())'):format(T, C.identifier, C.name, C.firstSeen, C.lastSeen),
-    touch  = ('UPDATE %s SET %s = ?, %s = NOW() WHERE %s = ?'):format(T, C.name, C.lastSeen, C.identifier),
-    byId   = ('SELECT %s FROM %s WHERE %s = ?'):format(C.identifier, T, C.id),
-    taken  = ('SELECT 1 FROM %s WHERE %s = ?'):format(T, C.id),
-    reassign = ('UPDATE %s SET %s = ? WHERE %s = ?'):format(T, C.id, C.id),
-    maxId  = ('SELECT MAX(%s) AS m FROM %s'):format(C.id, T),
+local function quoteIdent(value)
+    assert(type(value) == 'string' and value:match('^[%w_]+$'), ('invalid SQL identifier: %s'):format(tostring(value)))
+    return ('`%s`'):format(value)
+end
+
+local QT = quoteIdent(T)
+local QC = {
+    id = quoteIdent(C.id),
+    identifier = quoteIdent(C.identifier),
+    name = quoteIdent(C.name),
+    firstSeen = quoteIdent(C.firstSeen),
+    lastSeen = quoteIdent(C.lastSeen),
 }
+
+PID.Q = {
+    select = ('SELECT %s FROM %s WHERE %s = ? LIMIT 1'):format(QC.id, QT, QC.identifier),
+    insert = ('INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, NOW(), NOW())'):format(QT, QC.identifier, QC.name, QC.firstSeen, QC.lastSeen),
+    touch  = ('UPDATE %s SET %s = ?, %s = NOW() WHERE %s = ?'):format(QT, QC.name, QC.lastSeen, QC.identifier),
+    byId   = ('SELECT %s FROM %s WHERE %s = ? LIMIT 1'):format(QC.identifier, QT, QC.id),
+    taken  = ('SELECT 1 FROM %s WHERE %s = ? LIMIT 1'):format(QT, QC.id),
+    reassign = ('UPDATE %s SET %s = ? WHERE %s = ?'):format(QT, QC.id, QC.id),
+    maxId  = ('SELECT MAX(%s) AS m FROM %s'):format(QC.id, QT),
+    autoIncrement = ('ALTER TABLE %s AUTO_INCREMENT = %%d'):format(QT),
+}
+
+PID.Sql = { quoteIdent = quoteIdent, tableName = QT, columns = QC }
 
 local idByIdentifier = {}
 local idBySource = {}
@@ -27,22 +44,41 @@ end
 function PID.GetIdentifier(src)
     for _, t in ipairs(PID.IdentifierTypes()) do
         local id = GetPlayerIdentifierByType(src, t)
-        if id then return id end
+        if id and id ~= '' then return id end
     end
     return nil
 end
 
+local function selectExisting(identifier)
+    local row = MySQL.single.await(PID.Q.select, { identifier })
+    if not row then return nil end
+    return row[C.id]
+end
+
 function PID.Resolve(identifier, name)
     if idByIdentifier[identifier] then return idByIdentifier[identifier], false end
-    local row = MySQL.single.await(PID.Q.select, { identifier })
-    if row then
-        local id = row[C.id]
+
+    local id = selectExisting(identifier)
+    if id then
         idByIdentifier[identifier] = id
         return id, false
     end
-    local id = MySQL.insert.await(PID.Q.insert, { identifier, name })
-    if id then idByIdentifier[identifier] = id end
-    return id, true
+
+    local ok, insertedId = pcall(MySQL.insert.await, PID.Q.insert, { identifier, name })
+    if ok and insertedId then
+        idByIdentifier[identifier] = insertedId
+        return insertedId, true
+    end
+
+    -- Another connection may have created this identifier between SELECT and INSERT.
+    id = selectExisting(identifier)
+    if id then
+        idByIdentifier[identifier] = id
+        return id, false
+    end
+
+    if not ok then PID.Log('ERROR', ('failed to assign ID for %s: %s'):format(identifier, insertedId)) end
+    return nil, false
 end
 
 function PID.Get(src)
@@ -53,11 +89,8 @@ function PID.Get(src)
     if not identifier then return nil end
     local id = idByIdentifier[identifier]
     if not id then
-        local row = MySQL.single.await(PID.Q.select, { identifier })
-        if row then
-            id = row[C.id]
-            idByIdentifier[identifier] = id
-        end
+        id = selectExisting(identifier)
+        if id then idByIdentifier[identifier] = id end
     end
     if id then cacheActive(src, identifier, id) end
     return id
