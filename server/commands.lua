@@ -56,7 +56,7 @@ if sc.enabled then
         PID.ApplyNewId(identifier, new)
 
         local maxId = tonumber((MySQL.single.await(PID.Q.maxId) or {}).m) or 0
-        MySQL.update.await(('ALTER TABLE %s AUTO_INCREMENT = %d'):format(Config.Database.table, maxId + 1))
+        MySQL.update.await(PID.Q.autoIncrement:format(maxId + 1))
 
         PID.Hook('onReassign', cur, new, identifier)
         PID.Log('INFO', ('%s reassigned %s -> %s'):format(identifier, PID.FormatId(cur), PID.FormatId(new)))
