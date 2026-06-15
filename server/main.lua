@@ -1,170 +1,125 @@
--- ──────────────────────────────────────────────────────────────────────────────
---  W2F-ID  |  server/main.lua
--- ──────────────────────────────────────────────────────────────────────────────
+local DB = Config.Database
+local C = DB.columns
+local T = DB.table
 
-local Framework = nil
-local QBCore    = nil
-local ESX       = nil
+PID.Q = {
+    select = ('SELECT %s FROM %s WHERE %s = ?'):format(C.id, T, C.identifier),
+    insert = ('INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, NOW(), NOW())'):format(T, C.identifier, C.name, C.firstSeen, C.lastSeen),
+    touch  = ('UPDATE %s SET %s = ?, %s = NOW() WHERE %s = ?'):format(T, C.name, C.lastSeen, C.identifier),
+    byId   = ('SELECT %s FROM %s WHERE %s = ?'):format(C.identifier, T, C.id),
+    taken  = ('SELECT 1 FROM %s WHERE %s = ?'):format(T, C.id),
+    reassign = ('UPDATE %s SET %s = ? WHERE %s = ?'):format(T, C.id, C.id),
+    maxId  = ('SELECT MAX(%s) AS m FROM %s'):format(C.id, T),
+}
 
--- ─── Framework bootstrap ─────────────────────────────────────────────────────
+local idByIdentifier = {}
+local idBySource = {}
+local identifierBySource = {}
 
-local function DetectFramework()
-    local cfg = Config.Framework
-
-    if cfg == 'qbx' or (cfg == 'auto' and GetResourceState('qbx_core') == 'started') then
-        Framework = 'qbx'
-        QBCore    = exports['qbx_core']:GetCoreObject()
-
-    elseif cfg == 'qbcore' or (cfg == 'auto' and GetResourceState('qb-core') == 'started') then
-        Framework = 'qbcore'
-        QBCore    = exports['qb-core']:GetCoreObject()
-
-    elseif cfg == 'esx' or (cfg == 'auto' and GetResourceState('es_extended') == 'started') then
-        Framework = 'esx'
-        ESX       = exports['es_extended']:getSharedObject()
+local function cacheActive(src, identifier, id)
+    idBySource[src] = id
+    identifierBySource[src] = identifier
+    if Config.StateBag.enabled then
+        Player(src).state:set(Config.StateBag.key, id, Config.StateBag.replicated)
     end
 end
 
-AddEventHandler('onResourceStart', function(res)
-    if res == GetCurrentResourceName() then
-        Wait(100) -- brief yield so framework resources finish their own start
-        DetectFramework()
-        RegisterItems()
+function PID.GetIdentifier(src)
+    for _, t in ipairs(PID.IdentifierTypes()) do
+        local id = GetPlayerIdentifierByType(src, t)
+        if id then return id end
     end
-end)
-
--- ─── Player data extraction ───────────────────────────────────────────────────
-
-local function FormatDOB(raw)
-    if not raw or raw == '' then return '' end
-    -- QBCore stores as YYYY-MM-DD; convert to MM/DD/YYYY
-    local y, m, d = tostring(raw):match('^(%d%d%d%d)-(%d%d)-(%d%d)')
-    if y then return ('%s/%s/%s'):format(m, d, y) end
-    return tostring(raw)
-end
-
-local function GetPlayerData(source)
-    if Framework == 'qbx' or Framework == 'qbcore' then
-        local Player = QBCore.Functions.GetPlayer(source)
-        if not Player then return nil end
-
-        local ci  = Player.PlayerData.charinfo or {}
-        local sex = ci.gender
-        if type(sex) == 'number' then
-            sex = sex == 0 and 'M' or 'F'
-        else
-            sex = tostring(sex or 'M'):upper():sub(1,1)
-        end
-
-        return {
-            firstname   = ci.firstname   or 'Unknown',
-            lastname    = ci.lastname    or '',
-            dob         = FormatDOB(ci.birthdate),
-            sex         = sex,
-            nationality = ci.nationality or 'San Andreas',
-            cid         = Player.PlayerData.citizenid or tostring(source),
-            address     = (ci.street or '') ~= '' and ci.street or (ci.location or ''),
-        }
-
-    elseif Framework == 'esx' then
-        local xPlayer = ESX.GetPlayerFromId(source)
-        if not xPlayer then return nil end
-
-        local dobKey = (Config.ESX and Config.ESX.dobKey)    or 'dateofbirth'
-        local dobFb  = (Config.ESX and Config.ESX.dobFallback) or 'birthdate'
-        local dob    = xPlayer.get(dobKey)
-        if not dob or dob == '' then dob = xPlayer.get(dobFb) end
-
-        local sex = xPlayer.get('sex') or 'm'
-        sex = tostring(sex):upper():sub(1,1)
-
-        -- Build a short citizen-ID style token from the identifier
-        local ident = tostring(xPlayer.identifier or source)
-        local cid   = ident:match('[^:]+$') or ident
-        cid = cid:upper():sub(-8)
-
-        return {
-            firstname   = xPlayer.get('firstName')  or xPlayer.variables.firstName  or 'Unknown',
-            lastname    = xPlayer.get('lastName')   or xPlayer.variables.lastName   or '',
-            dob         = FormatDOB(dob),
-            sex         = sex,
-            nationality = 'San Andreas',
-            cid         = cid,
-            address     = '',
-        }
-    end
-
     return nil
 end
 
--- ─── Issue / expiry dates ─────────────────────────────────────────────────────
-
-local function Dates(cardType)
-    local now  = os.date('*t')
-    local iss  = ('%02d/%02d/%04d'):format(now.month, now.day, now.year)
-    local yrs  = cardType == 'weapon' and 2 or 4
-    local exp  = ('%02d/%04d'):format(now.month, now.year + yrs)
-    return iss, exp
-end
-
--- ─── Item → card type map ─────────────────────────────────────────────────────
-
-local ItemCardMap = {}
-
-local function BuildItemMap()
-    ItemCardMap = {}
-    if Config.Items.id_card        then ItemCardMap[Config.Items.id_card]        = 'id'     end
-    if Config.Items.driver_license then ItemCardMap[Config.Items.driver_license] = 'driver' end
-    if Config.Items.weapon_permit  then ItemCardMap[Config.Items.weapon_permit]  = 'weapon' end
-end
-
--- ─── Useable-item registration ────────────────────────────────────────────────
-
-local function UseItem(source, cardType)
-    local data = GetPlayerData(source)
-    if not data then
-        print('[w2f-id] Could not retrieve player data for source ' .. tostring(source))
-        return
+function PID.Resolve(identifier, name)
+    if idByIdentifier[identifier] then return idByIdentifier[identifier], false end
+    local row = MySQL.single.await(PID.Q.select, { identifier })
+    if row then
+        local id = row[C.id]
+        idByIdentifier[identifier] = id
+        return id, false
     end
-    local iss, exp = Dates(cardType)
-    data.iss = iss
-    data.exp = exp
-    TriggerClientEvent('w2f-id:showCard', source, cardType, data)
+    local id = MySQL.insert.await(PID.Q.insert, { identifier, name })
+    if id then idByIdentifier[identifier] = id end
+    return id, true
 end
 
-function RegisterItems()
-    BuildItemMap()
-
-    if Framework == 'qbcore' then
-        for itemName, cardType in pairs(ItemCardMap) do
-            QBCore.Functions.CreateUseableItem(itemName, function(source)
-                UseItem(source, cardType)
-            end)
+function PID.Get(src)
+    src = tonumber(src)
+    if not src or src <= 0 then return nil end
+    if idBySource[src] then return idBySource[src] end
+    local identifier = PID.GetIdentifier(src)
+    if not identifier then return nil end
+    local id = idByIdentifier[identifier]
+    if not id then
+        local row = MySQL.single.await(PID.Q.select, { identifier })
+        if row then
+            id = row[C.id]
+            idByIdentifier[identifier] = id
         end
+    end
+    if id then cacheActive(src, identifier, id) end
+    return id
+end
 
-    elseif Framework == 'qbx' then
-        for itemName, cardType in pairs(ItemCardMap) do
-            exports['qbx_core']:RegisterUsableItem(itemName, function(source)
-                UseItem(source, cardType)
-            end)
-        end
-
-    elseif Framework == 'esx' then
-        -- ESX requires waiting until it is fully initialised
-        TriggerEvent('esx:getSharedObject', function(obj)
-            ESX = obj
-            for itemName, cardType in pairs(ItemCardMap) do
-                ESX.RegisterUsableItem(itemName, function(source)
-                    UseItem(source, cardType)
-                end)
-            end
-        end)
+function PID.ApplyNewId(identifier, newId)
+    idByIdentifier[identifier] = newId
+    for s, lic in pairs(identifierBySource) do
+        if lic == identifier then cacheActive(s, identifier, newId) end
     end
 end
 
--- ─── Command-triggered card (client calls this via RegisterCommand) ────────────
+exports('GetPermanentId', PID.Get)
+exports('FormatId', PID.FormatId)
 
-RegisterNetEvent('w2f-id:requestCard', function(cardType)
-    local source = source
-    UseItem(source, cardType)
+AddEventHandler('playerConnecting', function(name, _, deferrals)
+    local src = source
+    deferrals.defer()
+    Wait(0)
+
+    local identifier = PID.GetIdentifier(src)
+    if not identifier then
+        PID.Log('WARN', ('no identifier for %s'):format(name))
+        if Config.Assignment.blockOnFailure then return deferrals.done(Config.Locale.noIdentifier) end
+        return deferrals.done()
+    end
+
+    deferrals.update(Config.Locale.fetching)
+
+    local id, isNew = PID.Resolve(identifier, name)
+    if not id then
+        if Config.Assignment.blockOnFailure then return deferrals.done(Config.Locale.dbError) end
+        return deferrals.done()
+    end
+
+    if Config.Assignment.updateNameOnJoin then
+        MySQL.update(PID.Q.touch, { name, identifier })
+    end
+
+    PID.Hook('onLoad', src, identifier, id)
+    if isNew then
+        PID.Hook('onAssign', src, identifier, id)
+        PID.Log('INFO', ('new ID %s for %s'):format(PID.FormatId(id), name))
+        PID.Discord('New Permanent ID', ('**%s**\n%s\n`%s`'):format(name, PID.FormatId(id), identifier))
+    else
+        PID.Log('DEBUG', ('%s loaded %s'):format(name, PID.FormatId(id)))
+    end
+
+    deferrals.done()
+end)
+
+AddEventHandler('playerJoining', function()
+    PID.Get(source)
+end)
+
+AddEventHandler('playerDropped', function()
+    local src = source
+    idBySource[src] = nil
+    identifierBySource[src] = nil
+end)
+
+RegisterNetEvent('permanent-id:request', function()
+    local src = source
+    TriggerClientEvent('permanent-id:receive', src, PID.Get(src))
 end)
