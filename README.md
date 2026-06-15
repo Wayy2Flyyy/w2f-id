@@ -10,22 +10,6 @@ kept forever. Standalone, but auto-detects QBCore, ESX, and QBox for notificatio
 
 Requires [oxmysql](https://github.com/overextended/oxmysql).
 
-## Structure
-
-```
-permanent-id/
-├── fxmanifest.lua
-├── config/config.lua      everything you'd ever tune
-├── shared/functions.lua   FormatId, identifier list
-├── server/
-│   ├── utils.lua          logging, discord, notify, hooks
-│   ├── ids.lua            assign/fetch/reassign + events
-│   ├── commands.lua       /myid /findid /setid
-│   └── main.lua           table auto-create
-├── client/main.lua        statebag reader + notify dispatch
-└── sql/permanent_id.sql   manual schema (optional)
-```
-
 ## Config highlights
 
 - Rename the table and every column.
