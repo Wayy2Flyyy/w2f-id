@@ -1,4 +1,4 @@
-# permanent-id
+# w2f-permanent id
 
 Every player gets a numeric ID the first time they connect, locked to their identifier and
 kept forever. Standalone, but auto-detects QBCore, ESX, and QBox for notifications.
