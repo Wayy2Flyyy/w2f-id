@@ -1,104 +1,100 @@
--- ──────────────────────────────────────────────────────────────────────────────
---  W2F-ID  |  client/main.lua
--- ──────────────────────────────────────────────────────────────────────────────
+local myId = nil
 
-local Framework  = nil
-local QBCore     = nil
-local ESX        = nil
-
--- ─── Framework bootstrap ─────────────────────────────────────────────────────
-
-local function DetectFramework()
-    local cfg = Config.Framework
-
-    if cfg == 'qbx' or (cfg == 'auto' and GetResourceState('qbx_core') == 'started') then
-        Framework = 'qbx'
-        QBCore    = exports['qbx_core']:GetCoreObject()
-
-    elseif cfg == 'qbcore' or (cfg == 'auto' and GetResourceState('qb-core') == 'started') then
-        Framework = 'qbcore'
-        QBCore    = exports['qb-core']:GetCoreObject()
-
-    elseif cfg == 'esx' or (cfg == 'auto' and GetResourceState('es_extended') == 'started') then
-        Framework = 'esx'
-        if GetResourceState('es_extended') == 'started' then
-            TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-            -- Modern ESX (1.9+) also exposes via export
-            if not ESX then
-                ESX = exports['es_extended']:getSharedObject()
-            end
-        end
-    end
-end
-
-AddEventHandler('onClientResourceStart', function(res)
-    if res == GetCurrentResourceName() then
-        DetectFramework()
-    end
+RegisterNetEvent('permanent-id:receive', function(id)
+    myId = id
 end)
 
-DetectFramework()
-
--- ─── NUI helper ───────────────────────────────────────────────────────────────
-
-local function ShowCard(cardType, data)
-    local themeMap = { id = 'id', driver = 'driver', weapon = 'weapon' }
-    local labelMap = {
-        id     = 'IDENTIFICATION CARD',
-        driver = 'DRIVER LICENSE',
-        weapon = 'WEAPON PERMIT',
-    }
-
-    SendNUIMessage({
-        action   = 'showCard',
-        theme    = themeMap[cardType] or 'id',
-        state    = Config.State,
-        docLabel = labelMap[cardType] or 'IDENTIFICATION CARD',
-        ttl      = Config.TTL,
-        max      = Config.MaxCards,
-
-        firstname   = data.firstname   or '',
-        lastname    = data.lastname    or '',
-        dob         = data.dob         or '',
-        sex         = data.sex         or '',
-        nationality = data.nationality or 'San Andreas',
-        cid         = data.cid         or '',
-        iss         = data.iss         or os.date('%m/%d/%Y'),
-        exp         = data.exp         or '',
-        address     = data.address     or '',
-        class       = data.class       or '',
-        photo       = data.photo       or '',
+local function chatNotify(msg, ntype)
+    TriggerEvent('chat:addMessage', {
+        color = ntype == 'error' and { 200, 0, 0 } or { 0, 200, 100 },
+        args = { Config.Locale.chatPrefix, msg },
     })
 end
 
--- ─── Receive card data from server ────────────────────────────────────────────
+local function resolveSystem()
+    local s = Config.Notify.system
+    if s ~= 'auto' then return s end
+    if GetResourceState('qb-core') == 'started' or GetResourceState('qbx_core') == 'started' then
+        return 'qbcore'
+    elseif GetResourceState('es_extended') == 'started' then
+        return 'esx'
+    elseif GetResourceState('ox_lib') == 'started' and lib then
+        return 'ox_lib'
+    end
+    return 'chat'
+end
 
-RegisterNetEvent('w2f-id:showCard', function(cardType, data)
-    ShowCard(cardType, data)
+local function notify(msg, ntype)
+    local sys = resolveSystem()
+    if sys == 'qbcore' then
+        TriggerEvent('QBCore:Notify', msg, ntype == 'error' and 'error' or (ntype == 'success' and 'success' or 'primary'))
+    elseif sys == 'esx' then
+        TriggerEvent('esx:showNotification', msg)
+    elseif sys == 'ox_lib' and lib and lib.notify then
+        lib.notify({ title = Config.Locale.chatPrefix, description = msg, type = ntype or 'inform' })
+    elseif sys == 'custom' then
+        TriggerEvent('permanent-id:customNotify', msg, ntype)
+    else
+        chatNotify(msg, ntype)
+    end
+end
+
+RegisterNetEvent('permanent-id:notify', function(msg, ntype)
+    notify(msg, ntype)
 end)
 
--- ─── Commands (debug / admin) ─────────────────────────────────────────────────
-
-if Config.Commands.showId then
-    RegisterCommand(Config.Commands.showId, function()
-        TriggerServerEvent('w2f-id:requestCard', 'id')
-    end, false)
+local function currentId()
+    if myId then return myId end
+    if Config.StateBag.enabled then return LocalPlayer.state[Config.StateBag.key] end
+    return nil
 end
 
-if Config.Commands.showLicense then
-    RegisterCommand(Config.Commands.showLicense, function()
-        TriggerServerEvent('w2f-id:requestCard', 'driver')
-    end, false)
-end
-
-if Config.Commands.showWeapon then
-    RegisterCommand(Config.Commands.showWeapon, function()
-        TriggerServerEvent('w2f-id:requestCard', 'weapon')
-    end, false)
-end
-
--- ─── NUI callbacks ────────────────────────────────────────────────────────────
-
-RegisterNUICallback('ready', function(_, cb)
-    cb('ok')
+exports('GetMyPermanentId', function()
+    return currentId()
 end)
+
+exports('FormatId', function(id)
+    return PID.FormatId(id)
+end)
+
+AddEventHandler('playerSpawned', function()
+    TriggerServerEvent('permanent-id:request')
+end)
+
+local function drawText2D(x, y, text, scale, c)
+    SetTextFont(4)
+    SetTextScale(scale, scale)
+    SetTextColour(c.r, c.g, c.b, c.a)
+    SetTextOutline()
+    SetTextCentre(true)
+    SetTextEntry('STRING')
+    AddTextComponentString(text)
+    DrawText(x, y)
+end
+
+local viewerVisible = Config.Viewer.startVisible
+
+CreateThread(function()
+    while true do
+        local sleep = 500
+        if Config.Viewer.enabled and viewerVisible then
+            local id = currentId()
+            if id then
+                sleep = 0
+                local v = Config.Viewer
+                drawText2D(v.position.x, v.position.y, ('%s  %s'):format(v.label, PID.FormatId(id)), v.scale, v.color)
+            end
+        end
+        Wait(sleep)
+    end
+end)
+
+if Config.Viewer.enabled then
+    RegisterCommand(Config.Viewer.command, function()
+        viewerVisible = not viewerVisible
+    end, false)
+
+    if Config.Viewer.keybind and Config.Viewer.keybind ~= '' then
+        RegisterKeyMapping(Config.Viewer.command, 'Toggle Permanent ID viewer', 'keyboard', Config.Viewer.keybind)
+    end
+end
